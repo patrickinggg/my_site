@@ -80,7 +80,17 @@ const socialLinks = [
 
 export default function Home() {
   const [activeParagraph, setActiveParagraph] = useState(0);
+  const [mobileSection, setMobileSection] = useState(0);
   const paragraphRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const touchStartY = useRef<number | null>(null);
+  const wheelLocked = useRef(false);
+  const mobileSectionCount = paragraphs.length + 1;
+
+  const goToMobileSection = (direction: 1 | -1) => {
+    setMobileSection((current) =>
+      Math.min(Math.max(current + direction, 0), mobileSectionCount - 1),
+    );
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -102,18 +112,107 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="subtle-pattern flex h-screen overflow-hidden font-sans text-zinc-950">
-      <section className="photo-panel flex w-2/5 items-center justify-center p-8">
-        <Image
-          src={photoMe}
-          alt="Photo of Shuye Liu"
-          className="relative z-10 h-auto w-full max-w-sm object-contain shadow-xl"
-          priority
-        />
-      </section>
+    <>
+      <main
+        className="photo-panel relative h-screen overflow-hidden font-sans text-zinc-950 md:hidden"
+        onWheel={(event) => {
+          if (wheelLocked.current || Math.abs(event.deltaY) < 30) return;
 
-      <section className="relative w-3/5 overflow-y-scroll scroll-smooth snap-y snap-mandatory">
-        <nav className="fixed right-12 top-10 z-30 flex gap-3" aria-label="Social links">
+          wheelLocked.current = true;
+          goToMobileSection(event.deltaY > 0 ? 1 : -1);
+
+          window.setTimeout(() => {
+            wheelLocked.current = false;
+          }, 700);
+        }}
+        onTouchStart={(event) => {
+          touchStartY.current = event.touches[0].clientY;
+        }}
+        onTouchEnd={(event) => {
+          if (touchStartY.current === null) return;
+
+          const distance = touchStartY.current - event.changedTouches[0].clientY;
+
+          if (Math.abs(distance) > 45) {
+            goToMobileSection(distance > 0 ? 1 : -1);
+          }
+
+          touchStartY.current = null;
+        }}
+      >
+        <section
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-12 p-8 transition-opacity duration-700 ${
+            mobileSection === 0 ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
+        >
+          <div className="relative z-20 w-full max-w-xs -translate-y-10">
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+              Shuye Liu / Patrick
+            </p>
+            <h1 className="mt-2 text-5xl font-bold tracking-tight text-zinc-950">
+              Shuye Liu
+            </h1>
+          </div>
+
+          <Image
+            src={photoMe}
+            alt="Photo of Shuye Liu"
+            className="relative z-10 h-auto w-full max-w-xs -translate-y-6 object-contain shadow-xl"
+            priority
+          />
+        </section>
+
+        {paragraphs.map((paragraph, index) => (
+          <section
+            key={index}
+            className={`absolute inset-0 z-10 flex items-center px-6 pb-32 pt-28 transition-opacity duration-700 ${
+              mobileSection === index + 1
+                ? "opacity-100"
+                : "pointer-events-none opacity-0"
+            }`}
+          >
+            <p className="text-xl leading-relaxed text-zinc-700">{paragraph}</p>
+          </section>
+        ))}
+
+        {mobileSection < mobileSectionCount - 1 && (
+          <div
+            className="breathing-arrow pointer-events-none fixed bottom-24 left-1/2 z-30 -translate-x-1/2 text-zinc-600/60"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 40 32" className="h-10 w-14" fill="none">
+              <path
+                d="M5 8l15 8 15-8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.25"
+              />
+              <path
+                d="M5 13l15 8 15-8"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.5"
+              />
+              <path
+                d="M5 18l15 8 15-8"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.85"
+              />
+            </svg>
+          </div>
+        )}
+
+        <nav
+          className="fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 gap-3"
+          aria-label="Social links"
+        >
           {socialLinks.map((link) => (
             <a
               key={link.name}
@@ -124,49 +223,92 @@ export default function Home() {
               className="group relative flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200/80 bg-white/70 text-zinc-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white hover:text-zinc-950 hover:shadow-md"
             >
               {link.icon}
-              <span className="pointer-events-none absolute top-14 whitespace-nowrap rounded-full bg-zinc-950 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition duration-200 group-hover:translate-y-1 group-hover:opacity-100">
+              <span className="pointer-events-none absolute bottom-14 whitespace-nowrap rounded-full bg-zinc-950 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition duration-200 group-hover:-translate-y-1 group-hover:opacity-100">
                 {link.name}
               </span>
             </a>
           ))}
         </nav>
 
-        <div className="sticky top-0 z-10 px-12 pb-8 pt-40">
-          <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">
-            Shuye Liu / Patrick
-          </p>
-          <h1 className="mt-2 text-5xl font-bold tracking-tight">Shuye Liu</h1>
-        </div>
-
-        <div className="fixed right-8 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
-          {paragraphs.map((_, index) => (
+        <div className="fixed right-4 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
+          {Array.from({ length: mobileSectionCount }).map((_, index) => (
             <div
               key={index}
               className={`h-3 w-3 rounded-full transition-all ${
-                activeParagraph === index
-                  ? "scale-125 bg-zinc-950"
-                  : "bg-zinc-300"
+                mobileSection === index ? "scale-125 bg-zinc-950" : "bg-zinc-300"
               }`}
-              aria-label={`Paragraph ${index + 1}`}
+              aria-label={`Section ${index + 1}`}
             />
           ))}
         </div>
+      </main>
 
-        {paragraphs.map((paragraph, index) => (
-          <div
-            key={index}
-            ref={(element) => {
-              paragraphRefs.current[index] = element;
-            }}
-            data-index={index}
-            className="flex min-h-screen snap-start items-center px-12 pt-32"
-          >
-            <p className="max-w-3xl -translate-y-16 text-2xl leading-relaxed text-zinc-700">
-              {paragraph}
+      <main className="subtle-pattern hidden h-screen overflow-hidden font-sans text-zinc-950 md:flex md:flex-row">
+        <section className="photo-panel relative flex w-2/5 items-center justify-center p-8">
+          <Image
+            src={photoMe}
+            alt="Photo of Shuye Liu"
+            className="relative z-10 h-auto w-full max-w-sm object-contain shadow-xl"
+            priority
+          />
+        </section>
+
+        <section className="relative w-3/5 overflow-y-scroll scroll-smooth snap-y snap-mandatory">
+          <nav className="fixed right-12 top-10 z-30 flex gap-3" aria-label="Social links">
+            {socialLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                target={link.href.startsWith("mailto:") ? undefined : "_blank"}
+                rel={link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                aria-label={link.name}
+                className="group relative flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200/80 bg-white/70 text-zinc-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white hover:text-zinc-950 hover:shadow-md"
+              >
+                {link.icon}
+                <span className="pointer-events-none absolute top-14 whitespace-nowrap rounded-full bg-zinc-950 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition duration-200 group-hover:translate-y-1 group-hover:opacity-100">
+                  {link.name}
+                </span>
+              </a>
+            ))}
+          </nav>
+
+          <div className="sticky top-0 z-10 px-12 pb-8 pt-40">
+            <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">
+              Shuye Liu / Patrick
             </p>
+            <h1 className="mt-2 text-5xl font-bold tracking-tight">Shuye Liu</h1>
           </div>
-        ))}
-      </section>
-    </main>
+
+          <div className="fixed right-8 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
+            {paragraphs.map((_, index) => (
+              <div
+                key={index}
+                className={`h-3 w-3 rounded-full transition-all ${
+                  activeParagraph === index
+                    ? "scale-125 bg-zinc-950"
+                    : "bg-zinc-300"
+                }`}
+                aria-label={`Paragraph ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          {paragraphs.map((paragraph, index) => (
+            <div
+              key={index}
+              ref={(element) => {
+                paragraphRefs.current[index] = element;
+              }}
+              data-index={index}
+              className="flex min-h-screen snap-start items-center px-12 pt-32"
+            >
+              <p className="max-w-3xl -translate-y-16 text-2xl leading-relaxed text-zinc-700">
+                {paragraph}
+              </p>
+            </div>
+          ))}
+        </section>
+      </main>
+    </>
   );
 }

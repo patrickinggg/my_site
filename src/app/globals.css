@@ -34,7 +34,6 @@ body {
 }
 
 .photo-panel {
-  position: relative;
   overflow: hidden;
   background:
     radial-gradient(circle at 25% 18%, rgba(251, 191, 36, 0.22), transparent 28%),
@@ -65,4 +64,21 @@ body {
   right: -90px;
   top: 90px;
   box-shadow: -190px 250px 0 -70px rgba(251, 191, 36, 0.18);
+}
+
+@keyframes gentle-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 0.75;
+    transform: translateY(6px);
+  }
+}
+
+.breathing-arrow {
+  animation: gentle-breathe 2.2s ease-in-out infinite;
 }
