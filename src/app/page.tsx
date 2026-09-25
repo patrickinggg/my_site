@@ -25,7 +25,7 @@ const socialLinks = [
   },
   {
     name: "LinkedIn",
-    href: "https://www.linkedin.com/in/patrick-liu-62a4363b0/",
+    href: "https://www.linkedin.com/in/liu-patrick-01b026176/",
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
         <path
