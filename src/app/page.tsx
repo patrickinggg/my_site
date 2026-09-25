@@ -114,7 +114,7 @@ export default function Home() {
   return (
     <>
       <main
-        className="photo-panel relative h-screen overflow-hidden font-sans text-zinc-950 md:hidden"
+        className="photo-panel relative h-[100dvh] overflow-hidden font-sans text-zinc-950 md:hidden"
         onWheel={(event) => {
           if (wheelLocked.current || Math.abs(event.deltaY) < 30) return;
 
