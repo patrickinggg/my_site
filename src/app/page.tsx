@@ -147,16 +147,16 @@ export default function Home() {
         >
           <div className="relative z-20 w-full max-w-xs -translate-y-10">
             <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
-              Shuye Liu / Patrick
+              Patrick Liu / Shuye
             </p>
             <h1 className="mt-2 text-5xl font-bold tracking-tight text-zinc-950">
-              Shuye Liu
+              Patrick Liu
             </h1>
           </div>
 
           <Image
             src={photoMe}
-            alt="Photo of Shuye Liu"
+            alt="Photo of Patrick Liu"
             className="relative z-10 h-auto w-full max-w-xs -translate-y-6 object-contain shadow-xl"
             priority
           />
@@ -274,9 +274,9 @@ export default function Home() {
 
           <div className="sticky top-0 z-10 px-12 pb-8 pt-40">
             <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">
-              Shuye Liu / Patrick
+              Shuye
             </p>
-            <h1 className="mt-2 text-5xl font-bold tracking-tight">Shuye Liu</h1>
+            <h1 className="mt-2 text-5xl font-bold tracking-tight">Patrick Liu</h1>
           </div>
 
           <div className="fixed right-8 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
